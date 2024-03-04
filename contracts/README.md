@@ -1,4 +1,4 @@
-# update_contracts
+# contracts
 
 This template uses TypeScript.
 

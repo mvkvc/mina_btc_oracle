@@ -1,4 +1,10 @@
-import { BTCBlockOracle, BlockHash, blockHashCompress, BTC_GENESIS_HASH } from './BTCBlockOracle';
+import { BTCBlockOracle } from './BTCBlockOracle.js';
+import {
+  BlockHash,
+  blockHashCompress,
+  BTC_GENESIS_HASH,
+  blockHashUncompress,
+} from './utils.js';
 import { Mina, PrivateKey, PublicKey, AccountUpdate } from 'o1js';
 
 let proofsEnabled = false;
@@ -40,15 +46,17 @@ describe('BTCBlockOracle', () => {
 
   it('generates and deploys the `BTCBlockOracle` smart contract', async () => {
     await localDeploy();
-    const blockHash = zkApp.blockHash1.get();
-    const compressedGenesisBlockHash = blockHashCompress(BlockHash.fromString(BTC_GENESIS_HASH));
-    expect(blockHash).toEqual(compressedGenesisBlockHash);
+    const blockHash1 = zkApp.blockHash1.get();
+    const genesisBlock = BlockHash.fromString(BTC_GENESIS_HASH);
+    const genesisBlockCompressed = blockHashCompress(genesisBlock);
+    expect(blockHash1).toEqual(genesisBlockCompressed);
   });
 
-  it('correctly updates the num state on the `BTCBlockOracle` smart contract', async () => {
+  it('correctly updates the blockHash1 state on the `BTCBlockOracle` smart contract', async () => {
     await localDeploy();
 
-    const latestBlockHash = "000000000000000000018f68fe07746b3a2c68424d763ab352ad8717aa0428e8";
+    const latestBlockHash =
+      '000000000000000000018f68fe07746b3a2c68424d763ab352ad8717aa0428e8';
     const newBlockHash = BlockHash.fromString(latestBlockHash);
 
     // BTCBlockOracle transaction
@@ -57,9 +65,11 @@ describe('BTCBlockOracle', () => {
     });
 
     await txn.prove();
-    await txn.sign([deployerKey]).send();
+    // await txn.sign([deployerKey]).send();
+    const result = await txn.sign([deployerKey, zkAppPrivateKey]).send();
 
-    const UpdatedBlockHash = zkApp.blockHash1.get();
-    expect(UpdatedBlockHash).toEqual(newBlockHash);
+    const updatedBlockHashCompressed = zkApp.blockHash1.get();
+    const updatedBlockHash = blockHashUncompress(updatedBlockHashCompressed);
+    expect(updatedBlockHash).toEqual(newBlockHash);
   });
 });

@@ -2,7 +2,8 @@
   "name": "mina_btc_oracle_server",
   "version": "0.1.0",
   "description": "",
-  "main": "out/index.js",
+  "main": "build/src/index.js",
+  "type": "module",
   "scripts": {
     "build": "tsc --project ./tsconfig.json",
     "start": "node ./out/src/index.js",
@@ -20,10 +21,12 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "cron": "^3.1.6",
+    "dotenv": "^16.4.5",
     "mina_btc_oracle_contracts": "file:../contracts",
-    "o1js": "^0.16.0",
-    "o1js-pack": "^0.5.1",
     "mina-signer": "^3.0.1",
-    "cron": "^3.1.6"
+    "node-fetch": "^3.3.2",
+    "o1js": "0.16.*",
+    "o1js-pack": "^0.5.1"
   }
 }

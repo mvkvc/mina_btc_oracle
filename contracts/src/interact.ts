@@ -14,7 +14,8 @@
  */
 import fs from 'fs/promises';
 import { Mina, NetworkId, PrivateKey } from 'o1js';
-import { BTCBlockOracle, BlockHash, BlockHashCompressed, blockHashCompress, blockHashUncompress } from './BTCBlockOracle.js';
+import { BTCBlockOracle } from './BTCBlockOracle.js';
+import { BlockHash } from './utils.js';
 
 // check command line arg
 let deployAlias = process.argv[2];
@@ -76,13 +77,14 @@ try {
   // call update() and send transaction
   console.log('build transaction and create proof...');
 
-  const latestBlockHash = "000000000000000000018f68fe07746b3a2c68424d763ab352ad8717aa0428e8";
+  const latestBlockHash =
+    '000000000000000000018f68fe07746b3a2c68424d763ab352ad8717aa0428e8';
   let tx = await Mina.transaction({ sender: feepayerAddress, fee }, () => {
     zkApp.update(BlockHash.fromString(latestBlockHash));
   });
   await tx.prove();
   console.log('send transaction...');
-  sentTx = await tx.sign([feepayerKey]).send();
+  sentTx = await tx.sign([feepayerKey, zkAppKey]).send();
 } catch (err) {
   console.log(err);
 }

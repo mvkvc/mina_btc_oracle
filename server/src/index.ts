@@ -1,41 +1,66 @@
-import { CronJob } from "cron";
+// import { CronJob } from "cron";
 import {
-  Update,
-  BlockHash,
-  Timestamp,
-  getTimestamp,
-} from "bitflip_contracts";
-import {
-  getLatestBlockHash,
-  getRandomBlockHash,
-  getBlockData,
-} from "./mempool";
+  BTC_GENESIS_HASH,
+  submitUpdate
+} from "mina_btc_oracle_contracts";
+import { PrivateKey } from 'o1js';
+import dotenv from 'dotenv';
 
-const GENESIS_BLOCK_HASH =
-  "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f";
+dotenv.config();
 
-let LATEST_BLOCK_HASH = "";
+let LATEST_BLOCK_HEIGHT = 0;
+let LATEST_BLOCK_HASH = BTC_GENESIS_HASH;
+const URL_BLOCKCHAIN_COM = "https://blockchain.info/latestblock";
+const KEY_FEE_PAYER_STR = process.env.KEY_PRIVATE_DEV || "";
+const KEY_ZKAPP_STR = process.env.KEY_PRIVATE_ZKAPP || "";
+
+const KEY_FEE_PAYER = PrivateKey.fromBase58(KEY_FEE_PAYER_STR);
+const KEY_ZKAPP = PrivateKey.fromBase58(KEY_ZKAPP_STR);
+const ADDRESS_FEE_PAYER = KEY_FEE_PAYER.toPublicKey();
+
+type APIResponse = {
+  height: number,
+  hash: string,
+}
+
+export async function getLatestBlockHash(url: string = URL_BLOCKCHAIN_COM): Promise<APIResponse | null> {
+  let result;
+  try {
+    const res = await fetch(URL_BLOCKCHAIN_COM);
+    const json: APIResponse = await res.json();
+    return { height: json.height, hash: json.hash };
+  } catch (e) {
+    console.log("ERROR: ", e);
+    return null;
+  }
+ 
+}
 
 const main = async () => {
-  const latestBlockHash = await getLatestBlockHash();
+  const result = await getLatestBlockHash();
 
-  if (LATEST_BLOCK_HASH !== latestBlockHash) {
-    console.log("New block found");
-    console.log(latestBlockHash);
-    LATEST_BLOCK_HASH = latestBlockHash;
+  if (result !== null) {
+    if (LATEST_BLOCK_HEIGHT < result.height && LATEST_BLOCK_HASH !== result.hash) {
+      LATEST_BLOCK_HEIGHT = result.height;
+      LATEST_BLOCK_HASH = result.hash;
+
+      try {
+        submitUpdate(result.hash, ADDRESS_FEE_PAYER, KEY_FEE_PAYER, KEY_ZKAPP);
+      } catch (e) {
+        console.log(e)
+      }
+    } 
   }
+}
 
-  const blockData = await getBlockData(latestBlockHash);
-  console.log(blockData);
-};
+main();
 
-const job = new CronJob(
-  "* * * * * *", // cronTime
-  function () {
-    main();
-  }, // onTick
-  null, // onComplete
-  true, // start
-  "America/Los_Angeles", // timeZone
-);
-// job.start() is optional here because of the fourth parameter set to true.
+// const job = new CronJob(
+//   "*/2 * * * *",
+//   function () {
+//     main();
+//   },
+//   null,
+//   true,
+//   "America/Los_Angeles",
+// );
