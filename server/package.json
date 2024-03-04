@@ -1,0 +1,29 @@
+{
+  "name": "mina_btc_oracle_server",
+  "version": "0.1.0",
+  "description": "",
+  "main": "out/index.js",
+  "scripts": {
+    "build": "tsc --project ./tsconfig.json",
+    "start": "node ./out/src/index.js",
+    "dev": "nodemon ./src/index.ts",
+    "format": "prettier --write ./src"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.11.16",
+    "nodemon": "^3.0.3",
+    "prettier": "^3.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "mina_btc_oracle_contracts": "file:../contracts",
+    "o1js": "^0.16.0",
+    "o1js-pack": "^0.5.1",
+    "mina-signer": "^3.0.1",
+    "cron": "^3.1.6"
+  }
+}
