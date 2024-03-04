@@ -2,24 +2,26 @@ import { Mina, NetworkId, PrivateKey, PublicKey } from 'o1js';
 import { BTCBlockOracle } from './BTCBlockOracle.js';
 import { BlockHash } from './utils.js';
 
+Error.stackTraceLimit = 1000;
+
 export async function submitUpdate(
   blockHash: string,
   feepayerAddress: PublicKey,
   feepayerKey: PrivateKey,
   zkAppKey: PrivateKey,
   fee: number = 0.1,
-  network: string = "testnet",
+  network: NetworkId = "testnet",
   url: string = "https://proxy.berkeley.minaexplorer.com/graphql"
 ): Promise<void> {
   const Network = Mina.Network({
-    networkId: network as NetworkId,
+    networkId: network,
     mina: url
   });
-  fee = fee * 1e9;
   Mina.setActiveInstance(Network);
   let zkAppAddress = zkAppKey.toPublicKey();
   let zkApp = new BTCBlockOracle(zkAppAddress);
   await BTCBlockOracle.compile();
+  fee = fee * 1e9;
   let tx = await Mina.transaction({ sender: feepayerAddress, fee }, () => {
     zkApp.update(BlockHash.fromString(blockHash));
   });

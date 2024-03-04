@@ -5,7 +5,8 @@
   "main": "build/src/index.js",
   "type": "module",
   "scripts": {
-    "build": "tsc --project ./tsconfig.json",
+    "copy": "rm -f ./mina_btc_oracle_contracts-0.1.0.tgz && cp ../contracts/mina_btc_oracle_contracts-0.1.0.tgz .",
+    "build": "npm run copy && tsc --project ./tsconfig.json",
     "start": "node ./out/src/index.js",
     "dev": "nodemon ./src/index.ts",
     "format": "prettier --write ./src"
@@ -14,6 +15,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@flydotio/dockerfile": "^0.5.2",
     "@types/node": "^20.11.16",
     "nodemon": "^3.0.3",
     "prettier": "^3.2.5",
@@ -23,10 +25,7 @@
   "dependencies": {
     "cron": "^3.1.6",
     "dotenv": "^16.4.5",
-    "mina_btc_oracle_contracts": "file:../contracts",
-    "mina-signer": "^3.0.1",
-    "node-fetch": "^3.3.2",
-    "o1js": "0.16.*",
-    "o1js-pack": "^0.5.1"
+    "mina_btc_oracle_contracts": "file:./mina_btc_oracle_contracts-0.1.0.tgz",
+    "o1js": "0.16.*"
   }
 }
