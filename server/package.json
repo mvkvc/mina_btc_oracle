@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "copy": "rm -f ./mina_btc_oracle_contracts-0.1.0.tgz && cp ../contracts/mina_btc_oracle_contracts-0.1.0.tgz .",
-    "build": "npm run copy && tsc --project ./tsconfig.json",
-    "start": "node ./out/src/index.js",
+    "build": "tsc --project ./tsconfig.json",
+    "start": "node ./build/src/index.js",
     "dev": "nodemon ./src/index.ts",
     "format": "prettier --write ./src"
   },

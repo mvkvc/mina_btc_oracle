@@ -10,3 +10,4 @@ primary_region = 'yyz'
 
 [[vm]]
   size = 'shared-cpu-1x'
+  memory = '1gb'

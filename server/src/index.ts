@@ -10,7 +10,8 @@ let LATEST_BLOCK_HASH = BTC_GENESIS_HASH;
 const URL_BLOCKCHAIN_COM = "https://blockchain.info/latestblock";
 const KEY_FEE_PAYER_STR = process.env.KEY_PRIVATE_DEV || "";
 const KEY_ZKAPP_STR = process.env.KEY_PRIVATE_ZKAPP || "";
-const TX_FEE = Number.parseFloat(process.env.TX_FEE || "0.05");
+const TX_FEE = Number.parseFloat(process.env.TX_FEE || "0.1");
+const N_MINUTES = Number.parseInt(process.env.N_MINUTES || "10");
 
 const KEY_FEE_PAYER = PrivateKey.fromBase58(KEY_FEE_PAYER_STR);
 const KEY_ZKAPP = PrivateKey.fromBase58(KEY_ZKAPP_STR);
@@ -58,20 +59,18 @@ const main = async () => {
           TX_FEE,
         );
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
     }
   }
 };
 
-// const job = new CronJob(
-//   "*/2 * * * *",
-//   function () {
-//     main();
-//   },
-//   null,
-//   true,
-//   "America/Los_Angeles",
-// );
-
-main();
+const job = new CronJob(
+  `*/${N_MINUTES} * * * *`,
+  function () {
+    main();
+  },
+  null,
+  true,
+  "America/Los_Angeles",
+);
